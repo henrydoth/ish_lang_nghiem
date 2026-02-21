@@ -94,6 +94,9 @@ _ln_read_key() {
 ln() {
   [[ -f "$LN_FILE" ]] || { echo "❌ Không thấy file: $LN_FILE"; return 1; }
 
+  # đảm bảo stty luôn được bật lại
+  trap 'stty echo < /dev/tty 2>/dev/null || true' EXIT
+
   # ---- Range block: ln K*:M* ----
   if [[ "${1:-}" =~ ^([0-9]+)\*:([0-9]+)\*$ ]]; then
     local b1="${BASH_REMATCH[1]}" b2="${BASH_REMATCH[2]}"
@@ -264,6 +267,7 @@ lnk() {
     before="$(echo "$before" | sed -E 's/^[[:space:]]*[0-9]+[.)][[:space:]]*//')"
     printf "%s%d%s  %s\n" "$_gray" "$n" "$_reset" "$before"
   done
+
   echo "----------------------------------------"
   echo "Nhập số câu muốn tụng. Enter = câu đầu tiên. q = thoát"
   printf "> "
