@@ -1,138 +1,347 @@
+# 📖 CÁC LỆNH & VÍ DỤ
+
+------
+
+# 🔢 1️⃣ Tụng theo số
+
+## ▶️ Tụng từ câu N → hết block 12 gần nhất
+
 ```
-# 📿 ish_lang_nghiem
+ln 13
+```
 
-Tụng Kinh / Chú Lăng Nghiêm trên Terminal  
-Chạy được trên:
+➡ Kết quả: 13 → 24
 
-- 🖥 Windows (Git Bash / WSL)
-- 📱 iPhone (iSH – Alpine Linux)
+```
+ln 2
+```
 
-Giữ màu ANSI, block 12 câu, tìm keyword, và tự động chuyển câu sau 3 giây nếu không bấm phím.
+➡ Kết quả: 2 → 12
 
----
+------
 
-## ✨ Tính năng
+## ▶️ Tụng từ A → B
 
-### 🔢 Tụng theo số
+```
+ln 13 27
+```
 
-```bash
-ln 13        # 13 → 24 (auto block 12)
-ln 13 27     # 13 → 27
-ln 0*        # block 0 (1 → 12)
-ln 1*        # block 1 (13 → 24)
-ln 2*        # block 2 (25 → 36)
-ln 0* 1*     # 1 → 24 (liền mạch)
-ln 0*:2*     # 1 → 36 (range block)
+➡ Tụng từ 13 → 27
+
+------
+
+# 🧩 2️⃣ Tụng theo block (12 câu / block)
+
+Block tính từ 0:
+
+| Block | Câu     |
+| ----- | ------- |
+| 0*    | 1 → 12  |
+| 1*    | 13 → 24 |
+| 2*    | 25 → 36 |
+| 3*    | 37 → 48 |
+
+------
+
+## ▶️ Một block
+
+```
+ln 0*
+ln 1*
+ln 2*
 ```
 
 ------
 
-### 🔎 Tìm theo từ khóa
+## ▶️ Nhiều block liền mạch
+
+```
+ln 0* 1*
+```
+
+➡ 1 → 24
+
+```
+ln 0* 1* 2*
+```
+
+➡ 1 → 36
+
+------
+
+## ▶️ Range block
+
+```
+ln 0*:2*
+```
+
+➡ 1 → 36
+
+```
+ln 2*:4*
+```
+
+➡ 25 → 60
+
+------
+
+# 🔎 3️⃣ Tìm theo từ khóa
 
 ```
 lnk "tát đát"
 ```
 
-- Liệt kê các câu match
-- Chọn số câu để tụng
-- Tự động tụng đến hết block 12
+Hiển thị danh sách match:
+
+```
+145  Tát đát tha...
+149  ...
+```
+
+Sau đó:
+
+- Nhập số câu muốn tụng
+- Enter = chọn câu đầu tiên
+- q = thoát
+
+Ví dụ:
+
+```
+lnk "bà"
+```
 
 ------
 
-### 🎨 Màu sắc
+# ⏳ 4️⃣ Tốc độ auto next
 
-- 12 câu chia 4 nhóm màu
-- Phiên âm và Hán tách màu khác nhau
-- Số thứ tự hiển thị màu xám
+Mặc định: 3 giây
 
-------
-
-### ⏳ Auto next 3 giây
-
-- Không bấm phím → tự động sang câu sau 3 giây
-- Bấm phím bất kỳ → sang ngay
-- Nhấn `q` hoặc `ESC` → thoát
-
-Có thể đổi tốc độ:
+Thay đổi:
 
 ```
 LN_TIMEOUT=1 ln 13
+```
+
+➡ Chuyển câu sau 1 giây
+
+```
 LN_TIMEOUT=5 ln 13
 ```
 
-------
-
-## 📂 Cấu trúc thư mục
-
-```
-ish_lang_nghiem/
-├── ln_lang_nghiem.bash
-├── lang_nghiem.md
-└── README.md
-```
-
-- `ln_lang_nghiem.bash` : script chính
-- `lang_nghiem.md` : nội dung kinh
+➡ 5 giây
 
 ------
 
-## 🚀 Cài đặt trên iPhone (iSH)
+# 🎹 5️⃣ Điều khiển khi đang tụng
 
-### 1️⃣ Cài bash + git
+Trong lúc tụng:
+
+| Phím        | Tác dụng            |
+| ----------- | ------------------- |
+| (không bấm) | Tự động qua câu sau |
+| Bất kỳ phím | Qua câu ngay        |
+| q           | Thoát               |
+| ESC         | Thoát               |
+
+------
+
+# 🎨 6️⃣ Màu sắc
+
+- 12 câu chia 4 nhóm màu
+- 3 câu 1 màu
+- Phiên âm và chữ Hán khác màu
+- Số thứ tự màu xám
+- Kết thúc:
 
 ```
-apk update
-apk add bash git
+🙏 Hết đoạn.
+Nam Mô A Di Đà Phật.
 ```
 
-### 2️⃣ Clone repo
+(Nam Mô A Di Đà Phật hiển thị in đậm, mỗi chữ 1 màu, nhảy từng chữ)
+
+------
+
+# 🧘 7️⃣ Ví dụ thực tế
+
+### Tụng từ 145 → hết block
 
 ```
-mkdir -p ~/GitHub
-cd ~/GitHub
+ln 145
+```
+
+------
+
+### Tụng 3 block đầu
+
+```
+ln 0*:2*
+```
+
+------
+
+### Tìm chữ “xá”
+
+```
+lnk "xá"
+```
+
+------
+
+### Tụng nhanh không chờ
+
+```
+LN_TIMEOUT=0 ln 13
+```
+
+------
+
+# 🛠 8️⃣ Kiểm tra lệnh đang dùng
+
+```
+type -a ln
+type -a lnk
+```
+
+------
+
+# 🔄 9️⃣ Cập nhật tool
+
+```
+git pull
+./install.sh
+```
+
+
+
+# 🖥 1️⃣ Windows (Git Bash)
+
+### Clone repo
+
+```
+cd /d/GitHub
 git clone https://github.com/henrydoth/ish_lang_nghiem.git
 cd ish_lang_nghiem
 ```
 
-### 3️⃣ Chạy
+### Cài đặt
 
 ```
-bash
-source ln_lang_nghiem.bash
+chmod +x install.sh
+./install.sh
+source ~/.bashrc
+```
+
+### Kiểm tra
+
+```
+type -a ln
+```
+
+Phải thấy:
+
+```
+ln is /c/Users/you/.local/bin/ln
+```
+
+### Dùng
+
+```
 ln 13
+ln 0*:2*
+lnk "bà"
 ```
 
 ------
 
-## 🖥 Cài đặt trên Windows
-
-### Git Bash
-
-```
-git clone https://github.com/henrydoth/ish_lang_nghiem.git
-cd ish_lang_nghiem
-source ln_lang_nghiem.bash
-ln 13
-```
-
-------
-
-### WSL (khuyên dùng)
+# 🖥 2️⃣ Windows WSL
 
 ```
 sudo apt update
 sudo apt install git bash
 git clone https://github.com/henrydoth/ish_lang_nghiem.git
 cd ish_lang_nghiem
-source ln_lang_nghiem.bash
-ln 13
+chmod +x install.sh
+./install.sh
+source ~/.bashrc
 ```
 
 ------
 
-## 🔄 Cập nhật khi sửa code
+# 🍎 3️⃣ macOS (Giữ ln – override an toàn)
 
-Trên PC:
+⚠ macOS có `/bin/ln`
+ Ta override bằng function trong `.zshrc`
+
+------
+
+### Clone repo
+
+```
+cd ~/Documents
+git clone https://github.com/henrydoth/ish_lang_nghiem.git
+cd ish_lang_nghiem
+```
+
+------
+
+### Cài đặt
+
+```
+chmod +x install.sh
+./install.sh
+source ~/.zshrc
+```
+
+------
+
+### Kiểm tra
+
+```
+type -a ln
+```
+
+Phải thấy:
+
+```
+ln is a shell function
+ln is /bin/ln
+```
+
+👉 Điều này đúng.
+
+- Gõ `ln` → chạy tool của bạn
+- Gõ `/bin/ln` → chạy ln hệ thống
+
+------
+
+# 📱 4️⃣ iPhone (iSH)
+
+### Cài bash + git
+
+```
+apk update
+apk add bash git
+bash
+```
+
+### Clone + cài
+
+```
+mkdir -p ~/GitHub
+cd ~/GitHub
+git clone https://github.com/henrydoth/ish_lang_nghiem.git
+cd ish_lang_nghiem
+chmod +x install.sh
+./install.sh
+source ~/.bashrc
+```
+
+------
+
+# 🔄 Cập nhật
+
+Trên máy chính:
 
 ```
 git add .
@@ -140,40 +349,60 @@ git commit -m "update"
 git push
 ```
 
-Trên iSH:
+Trên máy khác:
 
 ```
-cd ~/GitHub/ish_lang_nghiem
+cd ish_lang_nghiem
 git pull
+./install.sh
 ```
 
 ------
 
-## 🧘 Mục đích
+# 🛠 Nếu ln không nhận
 
-Dự án này giúp:
-
-- Học Bash thực tế
-- Làm chủ Git + GitHub
-- Đồng bộ môi trường Windows ↔ iPhone
-- Biến terminal thành không gian tu tập
-
-------
-
-## 🙏 Nam Mô A Di Đà Phật
+macOS:
 
 ```
----
+unalias ln 2>/dev/null
+unset -f ln 2>/dev/null
+hash -r
+source ~/.zshrc
+```
 
-# 🎯 Sau khi paste xong
+Windows:
 
-Trong Terminal:
-
-```bash
-git add README.md
-git commit -m "add README"
-git push
+```
+hash -r
+source ~/.bashrc
 ```
 
 ------
 
+# ⚙ Nếu gặp lỗi bash\r
+
+```
+perl -pi -e 's/\r\n/\n/g' *.sh *.bash
+```
+
+Repo đã có `.gitattributes` ép LF.
+
+------
+
+# 🎯 Sau khi cài thành công
+
+```
+ln 13
+ln 0*:2*
+lnk "tát"
+```
+
+Bạn sẽ có:
+
+- 12 câu chia màu
+- Auto 3 giây
+- Nhấn phím chuyển câu
+- q / ESC thoát
+- Kết thúc:
+   🙏 Hết đoạn.
+   Nam Mô A Di Đà Phật. (hào quang từng chữ)
