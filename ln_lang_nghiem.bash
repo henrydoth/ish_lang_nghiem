@@ -84,6 +84,42 @@ _ln_read_key() {
 }
 
 # ==========================================
+# 🌈 Hào quang kết thúc
+# - "Hết đoạn." bình thường
+# - "Nam Mô A Di Đà Phật." in đậm, mỗi chữ 1 màu
+# Cross-platform
+# ==========================================
+_ln_halo_end() {
+  echo
+  echo "🙏 Hết đoạn."
+
+  local reset=$'\033[0m'
+  local bold=$'\033[1m'
+  local delay="${LN_HALO_DELAY:-0.15}"
+
+  local colors=(
+    $'\033[31m'  # đỏ
+    $'\033[33m'  # vàng
+    $'\033[32m'  # xanh lá
+    $'\033[36m'  # cyan
+    $'\033[34m'  # xanh dương
+    $'\033[35m'  # tím
+  )
+
+  local words=("Nam" "Mô" "A" "Di" "Đà" "Phật.")
+  local i=0 c
+
+  for w in "${words[@]}"; do
+    c="${colors[$(( i % ${#colors[@]} ))]}"
+    printf "%s%s%s%s " "$bold" "$c" "$w" "$reset"
+    sleep "$delay" 2>/dev/null || true
+    i=$((i+1))
+  done
+
+  echo
+}
+
+# ==========================================
 # ln: tụng theo số
 # - ln N          -> N → bội 12 kế tiếp (vd 2→12, 13→24)
 # - ln A B        -> A → B (giữ kiểu cũ)
@@ -244,8 +280,7 @@ ln() {
     (( stop == 1 )) && break
   done
 
-  echo
-  echo "🙏 Hết đoạn. Nam Mô A Di Đà Phật."
+  _ln_halo_end
 }
 
 # ==========================================
