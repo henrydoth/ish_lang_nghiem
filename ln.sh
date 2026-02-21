@@ -1,20 +1,11 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# Lấy thư mục của script
-BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
-FILE="$BASE_DIR/lang_nghiem.md"
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Kiểm tra file tồn tại
-if [[ ! -f "$FILE" ]]; then
-  echo "Không tìm thấy lang_nghiem.md"
-  exit 1
-fi
+# Load functions
+source "$BASE_DIR/ln_lang_nghiem.bash"
 
-# Nếu không truyền tham số → mặc định bắt đầu từ 1
-start=${1:-1}
+# Nếu user chạy: ./ln.sh 13 27 hoặc ./ln.sh 0*...
+ln "$@"
 
-# Tính block 12 (13 → 24, 2 → 12, ...)
-end=$(( ((start - 1) / 12 + 1) * 12 ))
-
-# In nội dung từ start đến end
-sed -n "${start},${end}p" "$FILE"
