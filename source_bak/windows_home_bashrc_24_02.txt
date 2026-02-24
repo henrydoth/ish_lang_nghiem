@@ -1,0 +1,170 @@
+# ==================================================
+# Git Bash Config – Đỗ Thanh Liêm
+# File: ~/.bashrc
+# ==================================================
+
+export PATH="$HOME/.local/bin:$PATH"
+
+# dọn function cũ (nếu có)
+unset -f ln   2>/dev/null || true
+unset -f lnk  2>/dev/null || true
+unset -f add  2>/dev/null || true
+unset -f addk 2>/dev/null || true
+hash -r 2>/dev/null || true
+
+# vào GitHub folder
+cd /d/GitHub/ 2>/dev/null || true
+
+# ANSI Colors
+C_RESET=$'\033[0m'
+C_BOLD=$'\033[1m'
+C_YELLOW=$'\033[33m'
+C_GREEN=$'\033[32m'
+C_WHITE=$'\033[37m'
+
+# reload / reinstall
+alias sz='source ~/.bashrc'
+alias sln='cd /d/GitHub/ish_lang_nghiem && ./install.sh && source ~/.bashrc'
+alias mt='mantra'
+
+# git prompt
+if [[ -f /mingw64/share/git/completion/git-prompt.sh ]]; then
+  # shellcheck disable=SC1091
+  source /mingw64/share/git/completion/git-prompt.sh
+fi
+
+# git push nhanh
+gp() {
+  if [[ $# -eq 0 ]]; then
+    echo 'Example: gp "noi dung commit"'
+    return 1
+  fi
+  local timestamp
+  timestamp=$(date +"%m-%d %H:%M")
+  git add -A
+  git commit -m "${timestamp} | Windows 11 Home | $*"
+  git push
+}
+export -f gp
+
+export PS1='\['"$C_BOLD$C_YELLOW"'\]\W'\
+'\['"$C_BOLD$C_GREEN"'\]$(__git_ps1 " (%s)")'\
+'\['"$C_BOLD$C_WHITE"'\] \$ '\
+'\['"$C_RESET"'\]'
+
+# ==================================================
+# Load ish_lang_nghiem (ln/lnk) + add (Kinh A Di Đà)
+# ==================================================
+if [[ -f /d/GitHub/ish_lang_nghiem/ln_lang_nghiem.bash ]]; then
+  # shellcheck disable=SC1091
+  source /d/GitHub/ish_lang_nghiem/ln_lang_nghiem.bash
+fi
+
+if [[ -f /d/GitHub/ish_lang_nghiem/add_a_di_da.bash ]]; then
+  # shellcheck disable=SC1091
+  source /d/GitHub/ish_lang_nghiem/add_a_di_da.bash
+fi
+
+# ==================================================
+# mantra / halo
+# ==================================================
+mantra () {
+  local reset=$'\033[0m' bold=$'\033[1m'
+  local colors=($'\033[31m' $'\033[32m' $'\033[33m' $'\033[36m' $'\033[35m' $'\033[34m' $'\033[37m')
+  local i=0 c
+
+  local lines=(
+    "Nam mô A di đa bà dạ"
+    "Đa tha dà đa dạ."
+    "Đa điệt dạ tha,"
+    ""
+    "A di rị đô bà tỳ"
+    "A di rị đa tất đam bà tỳ"
+    "A di rị đa tỳ ca lan đế"
+    "A di rị đa tỳ ca lan đà."
+    ""
+    "Dà di nị"
+    "Dà dà na."
+    "Chỉ đa ca lệ"
+    "Ta bà ha."
+  )
+
+  for s in "${lines[@]}"; do
+    if [[ -z "$s" ]]; then
+      echo ""
+      sleep 0.3
+      continue
+    fi
+    c="${colors[$(( i % ${#colors[@]} ))]}"
+    printf "%s%s%s%s\n" "$bold" "$c" "$s" "$reset"
+    i=$((i+1))
+    sleep 0.25
+  done
+}
+export -f mantra
+
+halo () {
+  local reset=$'\033[0m'
+  local bold=$'\033[1m'
+  local colors=(
+    $'\033[31m' $'\033[33m' $'\033[32m'
+    $'\033[36m' $'\033[35m'
+  )
+
+  local s="Nam Mô A Di Đà Phật."
+  local tokens
+  tokens="$(printf "%s" "$s" | sed -E 's/([.,!?;:…]+)/\n\1\n/g')"
+
+  local i=0
+  local c="${colors[0]}"
+  local buf="" t
+
+  echo ""
+  while IFS= read -r t; do
+    [[ -z "$t" ]] && continue
+
+    case "$t" in
+      *[!.,\?\!\;\:\…]*)
+        buf+="$t"
+        ;;
+      *)
+        if [[ -n "$buf" ]]; then
+          printf "%s%s%s%s" "$bold" "$c" "$buf" "$reset"
+          buf=""
+        fi
+        printf "%s%s%s%s" "$bold" "$c" "$t" "$reset"
+
+        i=$((i+1))
+        c="${colors[$(( i % ${#colors[@]} ))]}"
+        sleep 0.18
+        ;;
+    esac
+  done <<< "$tokens"
+
+  if [[ -n "$buf" ]]; then
+    printf "%s%s%s%s" "$bold" "$c" "$buf" "$reset"
+  fi
+
+  echo ""
+  echo ""
+}
+export -f halo
+
+# ==================================================
+# Help banner
+# ==================================================
+echo ""
+echo "   ln 2        → 2→12"
+echo "   ln 13       → 13→24"
+echo "   ln 0*       → 1→12"
+echo "   ln 0*:2*    → 1→36"
+echo "   lnk \"xá\"   → tìm keyword"
+echo "   add         → Kinh A Di Đà 1→17 (auto 60s, rainbow theo dấu câu)"
+echo "   add 1 2     → Kinh A Di Đà 1→2"
+echo "   add 5 17    → Kinh A Di Đà 5→17"
+echo "   mt          → thiền nhanh"
+echo "   sz          → reload"
+echo "   sln         → reinstall tool"
+echo ""
+
+halo
