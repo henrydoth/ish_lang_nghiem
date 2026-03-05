@@ -1,0 +1,290 @@
+# ==================================================
+# Git Bash Config – Đỗ Thanh Liêm
+# File: ~/.bashrc
+# ==================================================
+
+[[ $- != *i* ]] && return
+
+__BASHRC_PWD_SAVE="$PWD"
+
+# ==================================================
+# PATH (không lặp)
+# ==================================================
+# ~/.local/bin
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
+# Python user Scripts (để gọi cowsay.exe)
+PY_USER_SCRIPTS="$HOME/AppData/Roaming/Python/Python311/Scripts"
+case ":$PATH:" in
+  *":$PY_USER_SCRIPTS:"*) ;;
+  *) PATH="$PY_USER_SCRIPTS:$PATH" ;;
+esac
+
+export PATH
+
+# Python UTF-8 output (fix Unicode in Git Bash)
+export PYTHONIOENCODING=utf-8
+
+# --- Cleanup ---
+unset -f ln lnk db dbk add addk g fun _fortune_local 2>/dev/null || true
+unalias g fun db 2>/dev/null || true
+hash -r 2>/dev/null || true
+
+# ==================================================
+# Auto-cd lần đầu nếu mở tại HOME
+# ==================================================
+if [[ -z "${__BASHRC_INITIALIZED:-}" ]]; then
+  export __BASHRC_INITIALIZED=1
+  if [[ "$PWD" == "$HOME" ]]; then
+    cd /d/GitHub/ 2>/dev/null || true
+  fi
+fi
+
+# ==================================================
+# Colors
+# ==================================================
+C_RESET=$'\033[0m'
+C_BOLD=$'\033[1m'
+C_YELLOW=$'\033[33m'
+C_GREEN=$'\033[32m'
+C_WHITE=$'\033[37m'
+
+# ==================================================
+# Aliases
+# - sz luôn in menu + halo mỗi lần reload
+# ==================================================
+alias sz='unset __BASHRC_BANNER_SHOWN; source ~/.bashrc'
+alias sln='cd /d/GitHub/ish_lang_nghiem && ./install.sh && unset __BASHRC_BANNER_SHOWN && source ~/.bashrc'
+alias mt='mantra'
+alias ll='ls -alF --color=auto'
+
+# ==================================================
+# g shortcut (GitHub jump)
+# ==================================================
+g() {
+  if [[ $# -eq 0 ]]; then
+    cd /d/GitHub || return
+  else
+    cd "/d/GitHub/$1" || return
+  fi
+}
+export -f g
+
+# ==================================================
+# fun + fortune local
+# - cowsay (pip) cần -t
+# - fortune: nếu chưa có, dùng file local ~/.games/quotes.txt
+# ==================================================
+_fortune_local() {
+  local Q="$HOME/.games/quotes.txt"
+  mkdir -p "$HOME/.games"
+  if [[ ! -f "$Q" ]]; then
+    cat > "$Q" <<'QEOF'
+Ánh sáng của Phật chính là tâm sáng của mình.
+Thọ mạng của Phật chính là tâm không sinh diệt.
+Cực Lạc chính là tâm thanh tịnh.
+
+Phản văn văn tự tánh – trở về tánh nghe.
+Nam Mô A Di Đà Phật.
+QEOF
+  fi
+
+  python - <<'PY'
+import random, pathlib
+p = pathlib.Path.home()/".games"/"quotes.txt"
+lines = [l.strip() for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
+print(random.choice(lines) if lines else "")
+PY
+}
+
+fun() {
+  local Q="$HOME/.games/quotes.txt"
+
+  if [[ $# -eq 0 ]]; then
+    if command -v cowsay >/dev/null 2>&1; then
+      if command -v fortune >/dev/null 2>&1; then
+        cowsay -t "$(fortune)"
+      else
+        cowsay -t "$(_fortune_local)"
+      fi
+    else
+      echo "cowsay not installed."
+    fi
+  else
+    case "$1" in
+
+      tetris) tetris ;;
+      halo) halo ;;
+
+      quote|quotes)
+        if [[ -f "$Q" ]]; then
+          nl -ba "$Q"
+        else
+          echo "No quotes yet: $Q"
+        fi
+        ;;
+
+      add)
+        shift
+        if [[ $# -eq 0 ]]; then
+          echo 'Usage: fun add "cau moi"'
+          return 1
+        fi
+        mkdir -p "$HOME/.games"
+        printf "%s\n" "$*" >> "$Q"
+        echo "✅ Added: $*"
+        ;;
+
+      del|rm)
+        if [[ -z "$2" ]]; then
+          echo "Usage: fun del <so>"
+          echo "Example: fun del 6"
+          return 1
+        fi
+        if [[ ! -f "$Q" ]]; then
+          echo "No quotes file: $Q"
+          return 1
+        fi
+        sed -i "${2}d" "$Q"
+        echo "🗑 Deleted quote #$2"
+        ;;
+
+      edit)
+        mkdir -p "$HOME/.games"
+        [[ -f "$Q" ]] || : > "$Q"
+        if command -v vim >/dev/null 2>&1; then
+          vim "$Q"
+        elif command -v nano >/dev/null 2>&1; then
+          nano "$Q"
+        else
+          echo "Open this file to edit: $Q"
+        fi
+        ;;
+
+      *)
+        echo 'fun | fun tetris | fun halo | fun quotes | fun add "cau" | fun del <so> | fun edit'
+        ;;
+    esac
+  fi
+}
+export -f fun
+
+# ==================================================
+# Git prompt
+# ==================================================
+if [[ -f /mingw64/share/git/completion/git-prompt.sh ]]; then
+  source /mingw64/share/git/completion/git-prompt.sh
+fi
+
+# ==================================================
+# gp (git push nhanh)
+# ==================================================
+gp() {
+  if [[ $# -eq 0 ]]; then
+    echo 'Example: gp "noi dung commit"'
+    return 1
+  fi
+  local timestamp
+  timestamp=$(date +"%m-%d %H:%M")
+  git add -A
+  git commit -m "${timestamp} |W_11_Home| $*"
+  git push
+}
+export -f gp
+
+export PS1='\['"$C_BOLD$C_YELLOW"'\]\W'\
+'\['"$C_BOLD$C_GREEN"'\]$(__git_ps1 " (%s)")'\
+'\['"$C_BOLD$C_WHITE"'\] \$ '\
+'\['"$C_RESET"'\]'
+
+# ==================================================
+# Load ish_lang_nghiem
+# - ln/lnk: Chú Lăng Nghiêm
+# - add/addk: Kinh A Di Đà
+# - db/dbk: Chú Đại Bi
+# ==================================================
+if [[ -f /d/GitHub/ish_lang_nghiem/ln_lang_nghiem.bash ]]; then
+  source /d/GitHub/ish_lang_nghiem/ln_lang_nghiem.bash
+fi
+
+if [[ -f /d/GitHub/ish_lang_nghiem/add_a_di_da.bash ]]; then
+  source /d/GitHub/ish_lang_nghiem/add_a_di_da.bash
+fi
+
+if [[ -f /d/GitHub/ish_lang_nghiem/db_dai_bi.bash ]]; then
+  source /d/GitHub/ish_lang_nghiem/db_dai_bi.bash
+fi
+
+# ==================================================
+# mantra / halo
+# ==================================================
+mantra () {
+  local reset=$'\033[0m' bold=$'\033[1m'
+  local colors=($'\033[31m' $'\033[32m' $'\033[33m' $'\033[36m' $'\033[35m')
+  local lines=(
+    "Nam mô A di đa bà dạ"
+    "Đa tha dà đa dạ."
+    "Đa điệt dạ tha,"
+    ""
+    "A di rị đô bà tỳ"
+    "A di rị đa tất đam bà tỳ"
+    "A di rị đa tỳ ca lan đế"
+    "A di rị đa tỳ ca lan đà."
+    ""
+    "Dà di nị"
+    "Dà dà na."
+    "Chỉ đa ca lệ"
+    "Ta bà ha."
+  )
+  local i=0
+  for s in "${lines[@]}"; do
+    [[ -z "$s" ]] && echo "" && sleep 0.2 && continue
+    printf "%s%s%s%s\n" "$bold" "${colors[$((i % ${#colors[@]}))]}" "$s" "$reset"
+    i=$((i+1))
+    sleep 0.2
+  done
+}
+export -f mantra
+
+halo () {
+  echo ""
+  printf "%s%sNam Mô A Di Đà Phật.%s\n\n" "$C_BOLD" "$C_YELLOW" "$C_RESET"
+}
+export -f halo
+
+# ==================================================
+# Banner (menu) — hiện khi mở terminal và mỗi lần gõ sz
+# ==================================================
+if [[ -z "${__BASHRC_BANNER_SHOWN:-}" ]]; then
+  export __BASHRC_BANNER_SHOWN=1
+
+  echo ""
+  echo "  📿 ln / lnk           → Tụng Chú Lăng Nghiêm"
+  echo "  🪷 db / dbk           → Tụng Chú Đại Bi (có English)"
+  echo "  📖 add [a b]          → Kinh A Di Đà (vd: add 2 | add 1 3)"
+  echo "  📂 g                  → về /d/GitHub"
+  echo "  📂 g <repo>           → vào repo (vd: g dtcs25_sstt)"
+  echo "  🚀 gp \"msg\"           → git add/commit/push nhanh"
+  echo "  🧘 mt                 → mantra"
+  echo "  🎮 tetris             → chơi tetris"
+  echo "  🐮 cowsay -t \"text\"    → bò nói"
+  echo "  🎲 fortune            → câu ngẫu nhiên (local/system)"
+  echo "  ✨ fun                → cowsay câu random"
+  echo "  ✨ fun quotes          → xem danh sách quote"
+  echo "  ✨ fun add \"câu\"        → thêm quote"
+  echo "  🗑 fun del 6           → xóa câu 6"
+  echo "  📜 ll                 → ls -alF"
+  echo "  🔄 sz                 → reload + hiện menu"
+  echo ""
+
+  halo
+fi
+
+# ==================================================
+# Restore directory
+# ==================================================
+cd "$__BASHRC_PWD_SAVE" 2>/dev/null || true
+unset __BASHRC_PWD_SAVE
