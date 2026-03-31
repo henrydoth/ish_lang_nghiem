@@ -2,12 +2,18 @@
 # ==========================================
 # add_a_di_da.bash (iSH READY)
 # Usage:
-#   add               # Kinh A Di Đà: 1 → 17 (auto 60s) + rainbow theo dấu câu + wrap theo từ + 1 dòng trống mỗi câu
+#   add               # Kinh A Di Đà: 1 → 17 (auto 10s)
 #   add 1 2           # Kinh A Di Đà: 1 → 2
 #   add 5 17          # Kinh A Di Đà: 5 → 17
 #
+# Dynamic timeout by command name:
+#   add5 3            # từ câu 3 → hết, mỗi câu 5s
+#   add30             # từ câu 1 → hết, mỗi câu 30s
+#   add60 5           # từ câu 5 → hết, mỗi câu 60s
+#   addN              # N là số giây từ 1 → 60
+#
 # Controls:
-#   (no key) 60s = auto next
+#   (no key) = auto next theo timeout
 #   any key  = next immediately
 #   q or ESC = quit
 # ==========================================
@@ -151,7 +157,7 @@ _add_print_punct_rainbow_wrap() {
 # ---- Read 1 key with timeout (auto-next) ----
 _add_read_key() {
   local key=""
-  local timeout="${add_TIMEOUT:-60}"
+  local timeout="${add_TIMEOUT:-$add_TIMEOUT_DEFAULT}"
 
   if [[ -n "$_add_TTY" ]]; then
     stty -echo < "$_add_TTY" 2>/dev/null || true
@@ -229,7 +235,7 @@ _add_run() {
       main="${raw%%#*}"
       han=""
       [[ "$raw" == *"#"* ]] && han="${raw#*#}"
-      main="$(echo "$main" | sed -E 's/^[[:space:]]*[0-9]+[.)][[:space:]]*//')"
+      main="$(printf "%s" "$main" | sed -E 's/^[[:space:]]*[0-9]+[.)][[:space:]]*//')"
 
       c_main="$(_add_color_main "$i")"
       c_han="$(_add_color_han "$i")"
@@ -297,3 +303,39 @@ add() {
   trap 'stty echo < /dev/tty 2>/dev/null || true' EXIT
   _add_run "$start" "$end"
 }
+
+# ==========================================
+# Optional shortcut functions when sourced
+# ==========================================
+for t in $(seq 1 60); do
+  eval "
+  add$t() {
+    local start=\${1:-1}
+    local end=\${2:-9999}
+    add_TIMEOUT=$t add \"\$start\" \"\$end\"
+  }
+  "
+done
+
+# ==========================================
+# Run directly (CLI mode)
+# Supports command names: add, add5, add12, ... add60
+# ==========================================
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  _add_cmd="$(basename "$0")"
+
+  if [[ "$_add_cmd" =~ ^add([0-9]+)$ ]]; then
+    _add_t="${BASH_REMATCH[1]}"
+
+    if (( _add_t < 1 || _add_t > 60 )); then
+      echo "❌ Chỉ hỗ trợ từ 1–60 giây"
+      exit 1
+    fi
+
+    _add_start="${1:-1}"
+    _add_end="${2:-9999}"
+    add_TIMEOUT="$_add_t" add "$_add_start" "$_add_end"
+  else
+    add "$@"
+  fi
+fi
