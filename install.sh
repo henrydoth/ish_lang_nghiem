@@ -9,9 +9,13 @@ mkdir -p "$BIN_DIR"
 
 ln -sf "$ROOT/ln.sh"  "$BIN_DIR/lng"
 ln -sf "$ROOT/lnk.sh" "$BIN_DIR/lngk"
-ln -sf "$ROOT/db.sh"  "$BIN_DIR/db"
 
-chmod +x "$ROOT/ln.sh" "$ROOT/lnk.sh" "$ROOT/db.sh" 2>/dev/null || true
+cat > "$BIN_DIR/db" <<'EOF'
+#!/usr/bin/env bash
+bash "$HOME/GitHub/ish_lang_nghiem/db.sh" "$@"
+EOF
+
+chmod +x "$ROOT/ln.sh" "$ROOT/lnk.sh" "$ROOT/db.sh" "$BIN_DIR/db" 2>/dev/null || true
 
 RC_FILE="$HOME/.bashrc"
 if [[ -n "${ZSH_VERSION:-}" ]] || [[ "${SHELL:-}" == *"zsh"* ]]; then

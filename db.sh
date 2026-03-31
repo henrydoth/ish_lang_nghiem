@@ -2,15 +2,7 @@
 set -euo pipefail
 
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$BASE_DIR/ln_lang_nghiem.bash"
 
-# Load functions chú Đại Bi
-source "$BASE_DIR/db_dai_bi.bash"
-
-# Nếu không truyền tham số thì vẫn chạy được
-ARGS=("$@")
-
-# Tên lệnh được gọi
-CMD="$(basename "$0")"
-
-# Mặc định gọi hàm db
-db "${ARGS[@]}"
+export LN_FILE="$BASE_DIR/dai_bi.md"
+ln "$@"
