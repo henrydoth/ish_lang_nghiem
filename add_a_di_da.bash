@@ -23,7 +23,7 @@ _add_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 add_FILE="${add_FILE:-"$_add_DIR/kinh_a_di_da.md"}"
 
 # ---- Default options for A Di Đà ----
-add_TIMEOUT_DEFAULT="${add_TIMEOUT_DEFAULT:-60}"   # auto-next seconds
+add_TIMEOUT_DEFAULT="${add_TIMEOUT_DEFAULT:-10}"   # auto-next seconds
 add_TITLE_DEFAULT="${add_TITLE_DEFAULT:-📿 TỤNG KINH / KINH A DI ĐÀ}"
 add_PUNCT_RAINBOW_DEFAULT="${add_PUNCT_RAINBOW_DEFAULT:-1}"
 add_SPACER_DEFAULT="${add_SPACER_DEFAULT:-1}"
