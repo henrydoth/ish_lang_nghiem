@@ -111,10 +111,11 @@ _add_print_punct_rainbow_wrap() {
 
     case "$tok" in
       *[!.,\?\!\;\:\…]*)
-        # TEXT: split words
+        # TEXT: split words (iSH-safe, no process substitution)
         local w
-        while IFS= read -r w; do
+        for w in $tok; do
           [[ -z "$w" ]] && continue
+
           local add_len=$(( ${#w} + (first_in_line ? 0 : 1) ))
           if (( col + add_len > cols )); then
             _add__nl_indent
@@ -128,7 +129,7 @@ _add_print_punct_rainbow_wrap() {
           printf "%s%s%s%s" "$bold" "$c" "$w" "$reset"
           col=$((col + ${#w}))
           first_in_line=0
-        done < <(printf "%s" "$tok" | tr ' ' '\n')
+        done
         ;;
       *)
         # PUNCT
@@ -184,7 +185,7 @@ _add_halo_end() {
   )
 
   local words=("Nam" "Mô" "A" "Di" "Đà" "Phật.")
-  local i=0 c
+  local i=0 c w
 
   for w in "${words[@]}"; do
     c="${colors[$(( i % ${#colors[@]} ))]}"
@@ -214,7 +215,7 @@ _add_run() {
   echo "⏳ Tự động sau ${add_TIMEOUT}s | Phím bất kỳ: câu kế | q/ESC: thoát"
   echo "----------------------------------------"
 
-  local i raw main han key c_main c_han stop=0
+  local i raw main han key c_main c_han
   local cols indent
 
   cols="$(_add_cols)"
@@ -260,7 +261,6 @@ _add_run() {
 
     key="$(_add_read_key)"
     if [[ "$key" == $'\e' || "$key" == "q" || "$key" == "Q" ]]; then
-      stop=1
       break
     fi
   done
