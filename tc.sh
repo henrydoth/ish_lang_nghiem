@@ -79,7 +79,7 @@ fi
 # ===== LIST =====
 if [[ $# -eq 0 ]]; then
   echo -e "${_pink}${_bold}📿 THẬP CHÚ${_reset}"
-  grep -nE '^[0-9]{2}\)' "$FILE" | sed 's/:/  /'
+  grep -E '^[0-9]{2}\)' "$FILE"
   exit 0
 fi
 
